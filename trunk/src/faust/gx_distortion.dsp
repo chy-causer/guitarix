@@ -111,7 +111,7 @@ filterbankN(lfreqs) = fi.filterbank(3,lfreqs);
 //----------distortion---------
 
 //-distortion
-drivelevel      = vslider("level[name:Level]", 0.0, 0, 0.5, 0.01);
+offset      = vslider("level[name:Offset][tooltip: Brings in even harmonics]", 0.0, 0, 0.5, 0.01) : smoothi(0.999);
 drivegain1      = vslider("gain[name:Gain]", 2, -10, 10, 0.1)-10 : ba.db2linear : smoothi(0.999);
 low_gain      	= vslider("low_gain[name:Lo]", 10, -10, 20, 0.1)-10 : ba.db2linear : smoothi(0.999);
 high_gain      	= vslider("high_gain[name:Hi]", 10, -10, 20, 0.1)-10 : ba.db2linear : smoothi(0.999);
@@ -122,10 +122,10 @@ drive1			= vslider("low_drive[name:Lo]", 1, 0, 1, 0.01)*drive;
 drive2			= vslider("high_drive[name:Hi]", 1, 0, 1, 0.01)*drive;
 drive3			= vslider("middle_l_drive[name:LoMid]", 1, 0, 1, 0.01)*drive;
 drive4			= vslider("middle_h_drive[name:HiMid]", 1, 0, 1, 0.01)*drive;
-distortion1 	=  _:ef.cubicnl(drive1,drivelevel): *(low_gain); 
-distortion2 	=  _:ef.cubicnl(drive2,drivelevel) : *(high_gain);
-distortion3 	=  _:ef.cubicnl(drive3,drivelevel) : *(middle_gain_l);
-distortion4 	=  _:ef.cubicnl(drive4,drivelevel) : *(middle_gain_h);
+distortion1 	=  _:ef.cubicnl_nodc(drive1,offset): *(low_gain);
+distortion2 	=  _:ef.cubicnl_nodc(drive2,offset) : *(high_gain);
+distortion3 	=  _:ef.cubicnl_nodc(drive3,offset) : *(middle_gain_l);
+distortion4 	=  _:ef.cubicnl_nodc(drive4,offset) : *(middle_gain_h);
 distortion	= fi.lowpass(2,15000.0): fi.highpass(1,31.0)  : filterbankN((F,(F1,F2))) : distortion2,distortion4 ,distortion3,distortion1 :>fi.lowpass(1,6531.0);
 
 //-resonator
